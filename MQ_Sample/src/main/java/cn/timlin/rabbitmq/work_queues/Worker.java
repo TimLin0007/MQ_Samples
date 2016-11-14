@@ -19,7 +19,7 @@ public class Worker {
 		ConnectionFactory factory = new ConnectionFactory();
 		factory.setHost("localhost");
 		Connection connection = factory.newConnection();
-		Channel channel = connection.createChannel();
+		final Channel channel = connection.createChannel();
 		// create a channel
 		channel.queueDeclare(QUEUE_NAME, false, false, false, null);
 		System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
@@ -37,6 +37,11 @@ public class Worker {
 					e.printStackTrace();
 				} finally {
 					System.out.println(" [x] Done");
+					/*
+					 * void com.rabbitmq.client.Channel.basicAck(long arg0, boolean arg1) throws IOException
+					 * 此方法的作用是告知消息队列已经完成，忘记调用则该任务会一直存在于消息队列之中无法释放
+					 */
+					channel.basicAck(envelope.getDeliveryTag(), false);
 				}
 			}
 		};
