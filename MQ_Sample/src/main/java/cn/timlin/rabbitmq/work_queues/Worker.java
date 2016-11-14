@@ -40,7 +40,16 @@ public class Worker {
 				}
 			}
 		};
-		boolean autoAck = true; // acknowledgment is covered below
+		/*
+		 * String com.rabbitmq.client.Channel.basicConsume(String arg0, boolean arg1, Consumer arg2) throws IOException
+		 * arg0：消息队列的名字
+		 * arg1：
+		 *       true 为true时消息队列把任务下发到执行者之后就会从队列中删除此任务，
+		 * 		      因此无法保证任务被顺利的执行。
+		 * 		 false 表示采取的消息防丢失的模式。即消息队列发送了任务到执行者之后，
+		 * 			   收到执行者执行成功的反馈后才会从消息队列之中删除。
+		 */
+		boolean autoAck = false; // acknowledgment is covered below
 		channel.basicConsume(QUEUE_NAME, autoAck, consumer);
 	}
 
