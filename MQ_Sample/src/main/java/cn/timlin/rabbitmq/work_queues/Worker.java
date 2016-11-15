@@ -21,8 +21,27 @@ public class Worker {
 		Connection connection = factory.newConnection();
 		final Channel channel = connection.createChannel();
 		// create a channel
-		channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+		/*
+		 * DeclareOk com.rabbitmq.client.Channel.queueDeclare(String arg0,
+		 * boolean arg1, boolean arg2, boolean arg3, Map<String, Object> arg4)
+		 * throws IOException
+		 * 
+		 * 注：队列创建之后将不允许再修改队列的属性
+		 * 
+		 * arg1:设置为true会开启队列退出后重新回到推出前的状态，保护队列之中未执行的任务继续执行
+		 * 	   
+		 */
+		boolean durable = true;
+		channel.queueDeclare(QUEUE_NAME, durable, false, false, null);
 		System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
+		
+		/*
+		 * channel.basicQos(prefetchCount);
+		 * 设置每次分发到执行者的任务量，比如为1时，表示当执行者完成一个任务之后才会分配下一个任务到执行者之中去
+		 */
+		int prefetchCount = 1;
+		channel.basicQos(prefetchCount);
+		
 		// close
 		Consumer consumer = new DefaultConsumer(channel) {
 			@Override
